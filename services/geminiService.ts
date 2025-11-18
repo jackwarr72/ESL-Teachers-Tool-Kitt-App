@@ -1,6 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 import { ProficiencyLevel, LanguageDomain, AgeGroup } from '../types';
 
+function getErrorMessage(err: any): string {
+  if (!err) return 'Unknown error';
+  if (err instanceof Error) return err.message;
+  try {
+    return JSON.stringify(err);
+  } catch {
+    return String(err);
+  }
+}
+
 const API_KEY = process.env.API_KEY;
 
 if (!API_KEY) {
@@ -45,7 +55,7 @@ export const generateLessonPlan = async (level: ProficiencyLevel, domain: Langua
     return response.text;
   } catch (error) {
     console.error("Error generating lesson plan:", error);
-    return "Failed to generate lesson plan. Please check the console for more details.";
+    return `Failed to generate lesson plan. Error: ${getErrorMessage(error)}`;
   }
 };
 
@@ -71,8 +81,8 @@ export const generateWorksheet = async (level: ProficiencyLevel, domain: Languag
         const response = await ai.models.generateContent({ model: textModel, contents: prompt });
         return response.text;
     } catch (error) {
-        console.error("Error generating worksheet:", error);
-        return "Failed to generate worksheet. Please check the console for more details.";
+      console.error("Error generating worksheet:", error);
+      return `Failed to generate worksheet. Error: ${getErrorMessage(error)}`;
     }
 };
 
@@ -97,8 +107,8 @@ export const provideWritingFeedback = async (level: ProficiencyLevel, text: stri
         const response = await ai.models.generateContent({ model: textModel, contents: prompt });
         return response.text;
     } catch (error) {
-        console.error("Error providing feedback:", error);
-        return "Failed to provide feedback. Please check the console for more details.";
+      console.error("Error providing feedback:", error);
+      return `Failed to provide feedback. Error: ${getErrorMessage(error)}`;
     }
 };
 
@@ -114,8 +124,8 @@ export const getProDevTopic = async (topic: string): Promise<string> => {
         const response = await ai.models.generateContent({ model: textModel, contents: prompt });
         return response.text;
     } catch (error) {
-        console.error("Error generating ProDev topic:", error);
-        return "Failed to generate professional development content. Please check the console for more details.";
+      console.error("Error generating ProDev topic:", error);
+      return `Failed to generate professional development content. Error: ${getErrorMessage(error)}`;
     }
 };
 
@@ -154,7 +164,7 @@ export const generateSpeakingPractice = async (level: ProficiencyLevel, topic: s
     return response.text;
   } catch (error) {
     console.error("Error generating speaking practice:", error);
-    return "Failed to generate speaking practice material. Please check the console for more details.";
+    return `Failed to generate speaking practice material. Error: ${getErrorMessage(error)}`;
   }
 };
 
@@ -190,6 +200,6 @@ export const getPronunciationFeedback = async (level: ProficiencyLevel, exercise
 
   } catch (error) {
     console.error("Error analyzing pronunciation:", error);
-    return "Failed to analyze pronunciation. Please check the console for more details.";
+    return `Failed to analyze pronunciation. Error: ${getErrorMessage(error)}`;
   }
 };
