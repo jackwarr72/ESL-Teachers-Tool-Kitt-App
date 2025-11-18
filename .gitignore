@@ -1,0 +1,24 @@
+﻿# Node
+node_modules/
+.DS_Store
+npm-debug.log*
+.env
+
+# Vite
+dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS
+Thumbs.db
+ehthumbs.db

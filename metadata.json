@@ -1,0 +1,7 @@
+{
+  "name": "ESL Teacher's AI Toolkit",
+  "description": "An AI-powered application for ESL teachers to generate lesson plans, worksheets, and teaching resources. It features customizable templates, interactive exercise ideas, writing feedback, and professional development modules to enhance the language learning experience for all proficiency levels.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
