@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import { ProficiencyLevel, LanguageDomain, AgeGroup } from '../types';
 
 function getErrorMessage(err: any): string {
@@ -11,16 +10,25 @@ function getErrorMessage(err: any): string {
   }
 }
 
-const API_KEY = process.env.API_KEY;
-
-if (!API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
 const textModel = 'gemini-2.5-pro';
 const audioModel = 'gemini-2.5-flash-native-audio-preview-09-2025';
+
+async function callProxy(prompt: string): Promise<string> {
+  try {
+    const resp = await fetch('/api/genai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      throw new Error(data?.error || `Proxy returned ${resp.status}`);
+    }
+    return data.text;
+  } catch (err) {
+    throw err;
+  }
+}
 
 const basePrompt = `
 You are an expert AI assistant for ESL teachers. Your responses must be structured, clear, and ready-to-use in a classroom setting. 
@@ -51,8 +59,8 @@ export const generateLessonPlan = async (level: ProficiencyLevel, domain: Langua
       
       Ensure all activities are appropriate for the specified age group and proficiency level.
     `;
-    const response = await ai.models.generateContent({ model: textModel, contents: prompt });
-    return response.text;
+    const text = await callProxy(prompt);
+    return text;
   } catch (error) {
     console.error("Error generating lesson plan:", error);
     return `Failed to generate lesson plan. Error: ${getErrorMessage(error)}`;
@@ -78,8 +86,8 @@ export const generateWorksheet = async (level: ProficiencyLevel, domain: Languag
 
             Make the content engaging and relevant to the topic.
         `;
-        const response = await ai.models.generateContent({ model: textModel, contents: prompt });
-        return response.text;
+        const text = await callProxy(prompt);
+        return text;
     } catch (error) {
       console.error("Error generating worksheet:", error);
       return `Failed to generate worksheet. Error: ${getErrorMessage(error)}`;
@@ -104,8 +112,8 @@ export const provideWritingFeedback = async (level: ProficiencyLevel, text: stri
             2.  **Corrections & Suggestions (Table):** Create a Markdown table with three columns: "Original Sentence", "Correction/Suggestion", and "Explanation". In the explanation, briefly explain the grammatical rule or vocabulary choice.
             3.  **Next Steps:** Suggest 1-2 specific practice exercises the student can do to improve.
         `;
-        const response = await ai.models.generateContent({ model: textModel, contents: prompt });
-        return response.text;
+        const text = await callProxy(prompt);
+        return text;
     } catch (error) {
       console.error("Error providing feedback:", error);
       return `Failed to provide feedback. Error: ${getErrorMessage(error)}`;
@@ -121,8 +129,8 @@ export const getProDevTopic = async (topic: string): Promise<string> => {
             The article should be practical, insightful, and provide actionable tips.
             Structure it with a clear introduction, several main points with examples, and a concluding summary.
         `;
-        const response = await ai.models.generateContent({ model: textModel, contents: prompt });
-        return response.text;
+        const text = await callProxy(prompt);
+        return text;
     } catch (error) {
       console.error("Error generating ProDev topic:", error);
       return `Failed to generate professional development content. Error: ${getErrorMessage(error)}`;
@@ -160,8 +168,8 @@ export const generateSpeakingPractice = async (level: ProficiencyLevel, topic: s
       - **Point System:** Propose a simple point system based on the rubric (e.g., Fluency: 25 points, Pronunciation: 25 points, etc., totaling 100).
       - **Badge Unlocked:** Create a creative and relevant badge name and a short, encouraging description for completing this task successfully. For example, for a job interview topic, a "Career Champion" badge.
     `;
-    const response = await ai.models.generateContent({ model: textModel, contents: prompt });
-    return response.text;
+    const text = await callProxy(prompt);
+    return text;
   } catch (error) {
     console.error("Error generating speaking practice:", error);
     return `Failed to generate speaking practice material. Error: ${getErrorMessage(error)}`;
@@ -195,8 +203,10 @@ export const getPronunciationFeedback = async (level: ProficiencyLevel, exercise
       },
     };
 
-    const response = await ai.models.generateContent({ model: audioModel, contents: { parts: [textPart, audioPart] } });
-    return response.text;
+    // Pronunciation feedback requires a binary audio-aware model endpoint.
+    // For now, proxying the prompt only — audio support requires extending the server proxy.
+    const text = await callProxy(textPart.text);
+    return text;
 
   } catch (error) {
     console.error("Error analyzing pronunciation:", error);
