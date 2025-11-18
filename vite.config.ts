@@ -5,8 +5,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    const isVercel = process.env.VERCEL === '1' || env.VERCEL === '1';
     return {
-      base: '/ESL-Teachers-Tool-Kitt-App/',
+      base: isVercel ? '/' : '/ESL-Teachers-Tool-Kitt-App/',
       server: {
         port: 3000,
         host: '0.0.0.0',
