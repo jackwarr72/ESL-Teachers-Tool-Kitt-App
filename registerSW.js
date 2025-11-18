@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/ESL-Teachers-Tool-Kitt-App/sw.js', { scope: '/ESL-Teachers-Tool-Kitt-App/' })})}
